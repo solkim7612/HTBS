@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: htbs
+  security:
+    user:
+      name: user
+      password: 1234
+
+  # 1. Database Configuration
+  datasource:
+    url: jdbc:mysql://localhost:3306/htbs
+    username: root
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # 2. JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+    open-in-view: false
+
+  # 3. Redis Configuration
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  # 4. MVC Path Matcher
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+# 5. Logging Level
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type: trace
+
+# 6. Swagger Config
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    groups-order: DESC
+    operations-sorter: method
+
+# 7. Jaegger Config
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  tracing:
+    sampling:
+      probability: 1.0  # 1.0? 100% ?? (?? ???, ????? 0.1 ??? ??)
+  otlp:
+    tracing:
+      endpoint: http://localhost:4318/v1/traces # Jaeger(OTLP HTTP)? ???? ??? ??
+
+  ${ADMIN_EMIAL}=admin
+  ${ADMIN_PW}=1234
