@@ -57,10 +57,13 @@ management:
         include: health, info, prometheus
   tracing:
     sampling:
-      probability: 1.0  # 1.0? 100% ?? (?? ???, ????? 0.1 ??? ??)
+      probability: 1.0
   otlp:
     tracing:
-      endpoint: http://localhost:4318/v1/traces # Jaeger(OTLP HTTP)? ???? ??? ??
+      endpoint: http://localhost:4318/v1/traces
 
-  ${ADMIN_EMIAL}=admin
-  ${ADMIN_PW}=1234
+# 8. jwt
+jwt:
+  secret: bXktYXdlc29tZS1odGJzLXNlY3JldC1rZXktZm9yLWp3dC1wcm92aWRlci1wb3J0Zm9saW8=
+  access-expiration: 1800000  # 30분 (1000 * 60 * 30)
+  refresh-expiration: 1209600000 # 14일 (1000 * 60 * 60 * 24 * 14)
