@@ -63,7 +63,35 @@ public class AuthService {
 
         long exp = jwt.getExp(accessToken);
 
-        redis.setBlacklist(accessToken, exp);
+        if (exp > 0) {
+            redis.setBlacklist(accessToken, exp);
+        }
+    }
+
+    @Transactional
+    public LoginResponse refresh(String refreshToken) {
+        if (!jwt.validateToken(refreshToken)) {
+            throw new CustomException(ErrorCode.TOKEN_NOT_MATCH);
+        }
+
+        String email = jwt.getEmail(refreshToken);
+        String oldRefreshToken = redis.getRefreshToken(email);
+
+        if (oldRefreshToken == null || !oldRefreshToken.equals(refreshToken)) {
+            redis.deleteRefreshToken(email);
+            throw new CustomException(ErrorCode.TOKEN_NOT_MATCH);
+        }
+
+        User user = repository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        String newAccessToken = jwt.createAccessToken(user.getEmail(), user.getRole().name());
+        String newRefreshToken = jwt.createRefreshToken(user.getEmail());
+
+        long refreshExp = jwt.getExp(newRefreshToken);
+        redis.saveRefreshToken(user.getEmail(), newRefreshToken, refreshExp);
+
+        return new LoginResponse(newAccessToken, newRefreshToken);
     }
 
     private String parseToken(String bearer) {

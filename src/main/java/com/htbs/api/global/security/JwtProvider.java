@@ -77,10 +77,14 @@ public class JwtProvider {
     }
 
     private Claims getClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(secret)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        try {
+            return Jwts.parser()
+                    .verifyWith(secret)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
+        }
     }
 }

@@ -32,4 +32,15 @@ public class AuthController {
         service.logout(bearer);
         return ResponseEntity.ok("로그아웃 되었습니다.");
     }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponse> refresh(@RequestHeader("Refresh-Token") String refreshToken) {
+        if (refreshToken.startsWith("Bearer ")) {
+            refreshToken = refreshToken.substring(7);
+        }
+
+        LoginResponse response = service.refresh(refreshToken);
+
+        return ResponseEntity.ok(response);
+    }
 }

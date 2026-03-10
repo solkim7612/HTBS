@@ -26,4 +26,8 @@ public class RedisService {
     public boolean isBlacklist(String accessToken) {
         return template.hasKey(accessToken);
     }
+
+    public String getRefreshToken(String email) {
+        return template.opsForValue().get("RT:" + email);
+    }
 }
