@@ -47,10 +47,10 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/api-docs/**",
                                 "/api/auth/signup",
-                                "api/auth/login"
+                                "/api/auth/login"
                         ).permitAll()
                         .requestMatchers(
-                                "api/admin/**"
+                                "/api/admin/**"
                         ).hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
