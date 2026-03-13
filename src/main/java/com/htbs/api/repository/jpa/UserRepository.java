@@ -1,4 +1,4 @@
-package com.htbs.api.repository;
+package com.htbs.api.repository.jpa;
 
 import com.htbs.api.entity.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;

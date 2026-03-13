@@ -28,7 +28,7 @@ public class Book extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     @Column(name = "book_type", nullable = false)
     private BookType type;
 

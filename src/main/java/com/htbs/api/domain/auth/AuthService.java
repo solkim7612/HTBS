@@ -1,20 +1,17 @@
 package com.htbs.api.domain.auth;
 
 import com.htbs.api.dto.auth.LoginRequest;
-import com.htbs.api.dto.auth.LoginResponse;
 import com.htbs.api.dto.auth.SignupRequest;
+import com.htbs.api.dto.auth.TokenDTO;
 import com.htbs.api.entity.user.User;
 import com.htbs.api.global.exception.CustomException;
 import com.htbs.api.global.exception.ErrorCode;
-import com.htbs.api.global.security.JwtAuthenticationFilter;
 import com.htbs.api.global.security.JwtProvider;
-import com.htbs.api.repository.UserRepository;
+import com.htbs.api.repository.jpa.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +34,7 @@ public class AuthService {
     }
 
     @Transactional
-    public LoginResponse login(LoginRequest request) {
+    public TokenDTO login(LoginRequest request) {
         User user = repository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
@@ -51,7 +48,7 @@ public class AuthService {
         long refreshExp = jwt.getExp(refreshToken);
         redis.saveRefreshToken(user.getEmail(), refreshToken, refreshExp);
 
-        return new LoginResponse(accessToken, refreshToken);
+        return TokenDTO.from(accessToken, refreshToken, user.getEmail(), user.getName());
     }
 
     @Transactional
@@ -69,7 +66,7 @@ public class AuthService {
     }
 
     @Transactional
-    public LoginResponse refresh(String refreshToken) {
+    public TokenDTO refresh(String refreshToken) {
         if (!jwt.validateToken(refreshToken)) {
             throw new CustomException(ErrorCode.TOKEN_NOT_MATCH);
         }
@@ -91,7 +88,7 @@ public class AuthService {
         long refreshExp = jwt.getExp(newRefreshToken);
         redis.saveRefreshToken(user.getEmail(), newRefreshToken, refreshExp);
 
-        return new LoginResponse(newAccessToken, newRefreshToken);
+        return TokenDTO.from(newAccessToken, newRefreshToken, user.getEmail(), user.getName());
     }
 
     private String parseToken(String bearer) {

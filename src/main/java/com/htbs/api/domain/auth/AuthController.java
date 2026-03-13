@@ -3,6 +3,7 @@ package com.htbs.api.domain.auth;
 import com.htbs.api.dto.auth.LoginRequest;
 import com.htbs.api.dto.auth.LoginResponse;
 import com.htbs.api.dto.auth.SignupRequest;
+import com.htbs.api.dto.auth.TokenDTO;
 import com.htbs.api.global.exception.CustomException;
 import com.htbs.api.global.exception.ErrorCode;
 import com.htbs.api.global.security.CookieUtil;
@@ -29,13 +30,13 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        LoginResponse response = service.login(request);
+        TokenDTO token = service.login(request);
 
-        ResponseCookie cookie = util.addCookie(response.getRefreshToken());
+        ResponseCookie cookie = util.addCookie(token.getRefreshToken());
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(new LoginResponse(response.getAccessToken(), null));
+                .body(new LoginResponse(token.getAccessToken(), token.getName()));
     }
 
     @PostMapping("/logout")
@@ -56,12 +57,12 @@ public class AuthController {
             throw new CustomException(ErrorCode.TOKEN_NOT_MATCH);
         }
 
-        LoginResponse response = service.refresh(refreshToken);
+        TokenDTO token = service.refresh(refreshToken);
 
-        ResponseCookie cookie = util.addCookie(response.getRefreshToken());
+        ResponseCookie cookie = util.addCookie(token.getRefreshToken());
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(new LoginResponse(response.getAccessToken(), null));
+                .body(new LoginResponse(token.getAccessToken(), token.getName()));
     }
 }
